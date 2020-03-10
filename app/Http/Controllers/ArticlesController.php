@@ -7,10 +7,10 @@ use App\Article;
 
 class ArticlesController extends Controller
 {
-    public function show($articleId)
+    public function show(Article $article)
     {   
         return view('articles.show',[
-            'article' => Article::findOrFail($articleId)
+            'article' => $article
         ]);
     }
 
@@ -30,48 +30,44 @@ class ArticlesController extends Controller
     {   
         // dd(request()->all());
 
-        request()->validate([
-            'title' => 'required',
-            'excerpt' => 'required',
-            'body' => 'required'
-        ]);
+        // $validatedAttributes = request()->validate([
+        //     'title' => 'required',
+        //     'excerpt' => 'required',
+        //     'body' => 'required'
+        // ]);
         
-        $article = new Article();
-        $article->title = request('title');
-        $article->excerpt = request('excerpt');
-        $article->body = request('body');
-        $article->save();
+        // // return $validatedAttributes;
 
+        // Article::create($validatedAttributes);
+
+        Article::create($this->validateArticle());
 
         return redirect('/articles');
     }
 
-    public function edit($articleId)
+    public function edit(Article $article)
     {   
-        $article =Article::findOrFail($articleId);
-                
+               
         return view('articles.edit',compact('article'));
 
     }
 
-    public function update($articleId)
+    public function update(Article $article)
     {   
         // dd(request()->all());
 
-        request()->validate([
+        $article->update($this->validateArticle());
+        
+        return redirect('/articles/'.$article->id);
+    }
+
+    protected function validateArticle()
+    {
+        return request()->validate([
             'title' => 'required',
             'excerpt' => 'required',
             'body' => 'required'
         ]);
-        
-        $article = Article::findOrFail($articleId);
-
-        $article->title = request('title');
-        $article->excerpt = request('excerpt');
-        $article->body = request('body');
-        $article->save();
-
-        return redirect('/articles/'.$articleId);
     }
 }
 
